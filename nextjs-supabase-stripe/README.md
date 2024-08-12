@@ -21,7 +21,7 @@ This is a functional stripe integrated boilerplate.
 - Supabase Auth
 - Simple Icons
 - Stripe
-- Shadcnui
+- Shadcn UI
 
 ### Recommended Tools
 
