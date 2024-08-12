@@ -4,6 +4,10 @@ A collection of XRL-managed boilerplates to ensure speed and efficiency in devel
 
 XRL boilerplates are diverse, ranging from react to next to vue and expo.
 
+## Boilerplates
+
+- [XRL NextJS - Supabase - Stripe Boilerplate](https://github.com/rubixvi/XRL-Boilerplate/tree/master/nextjs-supabase-stripe#xrl-nextjs---supabase---stripe-boilerplate)
+
 ## Learn more
 
 To learn more about developing XRL, look at the following resources:
