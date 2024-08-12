@@ -25,7 +25,7 @@ export const createClient = () => {
             // user sessions.
           }
         },
-      }
+      },
     }
-  );
-};
+  )
+}
