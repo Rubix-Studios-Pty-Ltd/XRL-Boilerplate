@@ -4,8 +4,8 @@ This boilerplate provides the base for using NextJS with Supabase Auth and Strip
 This is a functional stripe integrated boilerplate.
 
 ![Screenshot of Boilerplate](./public/nextjsboilerplate.png)
-![Screenshot of Authentication](./public/nextjsboilerauth.png)
-![Screenshot of Accounts](./public/nextjsboileraccounts.png)
+![Screenshot of Authentication](./public/nextjsboilerplateauth.png)
+![Screenshot of Accounts](./public/nextjsboilerplateaccounts.png)
 
 ## Features
 
