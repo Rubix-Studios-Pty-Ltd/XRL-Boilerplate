@@ -81,7 +81,7 @@ export default function Footer() {
           <div className="flex items-center h-10 space-x-6">
             <a
               aria-label="Github Repository"
-              href="https://github.com/vercel/nextjs-subscription-payments"
+              href="https://github.com/rubixvi/XRL-Boilerplate"
             >
               <SiGithub className="h-10 w-10" />
             </a>
