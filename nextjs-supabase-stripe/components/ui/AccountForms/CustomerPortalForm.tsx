@@ -1,12 +1,12 @@
 'use client';
 
-import Button from '@/components/ui/Button';
+import { Button } from '@/components/ui/button';
 import { useRouter, usePathname } from 'next/navigation';
 import { useState } from 'react';
 import { createStripePortal } from '@/utils/stripe/server';
 import Link from 'next/link';
-import Card from '@/components/ui/Card';
-import { Tables } from '@/types_db';
+import Card from '@/components/ui/card';
+import { Tables } from '@/database.types';
 
 type Subscription = Tables<'subscriptions'>;
 type Price = Tables<'prices'>;
@@ -56,11 +56,10 @@ export default function CustomerPortalForm({ subscription }: Props) {
         <div className="flex flex-col items-start justify-between sm:flex-row sm:items-center">
           <p className="pb-4 sm:pb-0">Manage your subscription on Stripe.</p>
           <Button
-            variant="slim"
             onClick={handleStripePortalRequest}
-            loading={isSubmitting}
+            className="min-w-32"
           >
-            Open customer portal
+            Open Portal
           </Button>
         </div>
       }

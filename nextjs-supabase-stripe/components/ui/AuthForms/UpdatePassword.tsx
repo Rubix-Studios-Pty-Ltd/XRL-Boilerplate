@@ -1,10 +1,20 @@
 'use client';
 
-import Button from '@/components/ui/Button';
-import { updatePassword } from '@/utils/auth-helpers/server';
+import { Button } from '@/components/ui/button';
 import { handleRequest } from '@/utils/auth-helpers/client';
+import { Input } from "@/components/ui/input"
+import { Loader2 } from "lucide-react"
+import { updatePassword } from '@/utils/auth-helpers/server';
+import { useForm } from "react-hook-form"
 import { useRouter } from 'next/navigation';
-import React, { useState } from 'react';
+import { useState } from 'react';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+} from "@/components/ui/form"
 
 interface UpdatePasswordProps {
   redirectMethod: string;
@@ -13,13 +23,14 @@ interface UpdatePasswordProps {
 export default function UpdatePassword({
   redirectMethod
 }: UpdatePasswordProps) {
-  const router = useRouter(); // Always call the hook
+  const router = useRouter();
+  const form = useForm();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    setIsSubmitting(true); // Disable the button while the request is being handled
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsSubmitting(true);
 
-    // Conditionally use the router based on redirectMethod
     const nextRouter = redirectMethod === 'client' ? router : null;
     await handleRequest(e, updatePassword, nextRouter);
 
@@ -27,43 +38,67 @@ export default function UpdatePassword({
   };
 
   return (
-    <div className="my-8">
+    <div className="my-3">
+      <Form {...form}>
       <form
         noValidate={true}
         className="mb-4"
-        onSubmit={(e) => handleSubmit(e)}
+        onSubmit={(e) => onSubmit(e)}
       >
         <div className="grid gap-2">
-          <div className="grid gap-1">
-            <label htmlFor="password">New Password</label>
-            <input
-              id="password"
-              placeholder="Password"
-              type="password"
+            <FormField
               name="password"
-              autoComplete="current-password"
-              className="w-full p-3 rounded-md bg-zinc-800"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Password</FormLabel>
+                  <FormControl>
+                    <Input 
+                      id="password"
+                      type="password"
+                      className="focus-visible:ring-0"
+                      autoComplete="off"
+                      placeholder="" {...field} 
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
             />
-            <label htmlFor="passwordConfirm">Confirm New Password</label>
-            <input
-              id="passwordConfirm"
-              placeholder="Password"
-              type="password"
+            <FormField
               name="passwordConfirm"
-              autoComplete="current-password"
-              className="w-full p-3 rounded-md bg-zinc-800"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Confirm Password</FormLabel>
+                  <FormControl>
+                    <Input 
+                      id="passwordConfirm"
+                      type="password"
+                      className="focus-visible:ring-0"
+                      autoComplete="off"
+                      placeholder="" {...field} 
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
             />
-          </div>
           <Button
-            variant="slim"
             type="submit"
             className="mt-1"
-            loading={isSubmitting}
+            disabled={isSubmitting}
           >
-            Update Password
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Please wait
+                </>
+              ) : (
+                'Update Password'
+              )}
           </Button>
         </div>
       </form>
+      </Form>
     </div>
   );
 }

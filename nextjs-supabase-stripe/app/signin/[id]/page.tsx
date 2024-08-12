@@ -1,4 +1,3 @@
-import Logo from '@/components/icons/Logo';
 import { createClient } from '@/utils/supabase/server';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
@@ -8,14 +7,14 @@ import {
   getDefaultSignInView,
   getRedirectMethod
 } from '@/utils/auth-helpers/settings';
-import Card from '@/components/ui/Card';
-import PasswordSignIn from '@/components/ui/AuthForms/PasswordSignIn';
-import EmailSignIn from '@/components/ui/AuthForms/EmailSignIn';
-import Separator from '@/components/ui/AuthForms/Separator';
-import OauthSignIn from '@/components/ui/AuthForms/OauthSignIn';
-import ForgotPassword from '@/components/ui/AuthForms/ForgotPassword';
-import UpdatePassword from '@/components/ui/AuthForms/UpdatePassword';
-import SignUp from '@/components/ui/AuthForms/Signup';
+import Card from '@/components/ui/card';
+import PasswordSignIn from '@/components/ui/authforms/passwordsignin';
+import EmailSignIn from '@/components/ui/authforms/emailsignin';
+import Separator from '@/components/ui/authforms/separator';
+import SignUp from '@/components/ui/authforms/signup';
+import OauthSignIn from '@/components/ui/authforms/oauthsignin';
+import ForgotPassword from '@/components/ui/authforms/forgotpassword';
+import UpdatePassword from '@/components/ui/authforms/updatepassword';
 
 export default async function SignIn({
   params,
@@ -28,10 +27,8 @@ export default async function SignIn({
   const viewTypes = getViewTypes();
   const redirectMethod = getRedirectMethod();
 
-  // Declare 'viewProp' and initialize with the default value
   let viewProp: string;
 
-  // Assign url id to 'viewProp' if it's a valid string and ViewTypes includes it
   if (typeof params.id === 'string' && viewTypes.includes(params.id)) {
     viewProp = params.id;
   } else {
@@ -41,7 +38,6 @@ export default async function SignIn({
     return redirect(`/signin/${viewProp}`);
   }
 
-  // Check if the user is already logged in and redirect to the account page if so
   const supabase = createClient();
 
   const {
@@ -55,11 +51,8 @@ export default async function SignIn({
   }
 
   return (
-    <div className="flex justify-center height-screen-helper">
+    <div className="flex justify-center min-h-[calc(100dvh-8rem)] md:min-h[calc(100dvh-8rem)]">
       <div className="flex flex-col justify-between max-w-lg p-3 m-auto w-80 ">
-        <div className="flex justify-center pb-12 ">
-          <Logo width="64px" height="64px" />
-        </div>
         <Card
           title={
             viewProp === 'forgot_password'
@@ -67,15 +60,15 @@ export default async function SignIn({
               : viewProp === 'update_password'
                 ? 'Update Password'
                 : viewProp === 'signup'
-                  ? 'Sign Up'
+                  ? 'Create Account'
                   : 'Sign In'
           }
         >
           {viewProp === 'password_signin' && (
-            <PasswordSignIn
-              allowEmail={allowEmail}
-              redirectMethod={redirectMethod}
-            />
+              <PasswordSignIn
+                allowEmail={allowEmail}
+                redirectMethod={redirectMethod}
+              />
           )}
           {viewProp === 'email_signin' && (
             <EmailSignIn
@@ -101,7 +94,7 @@ export default async function SignIn({
             viewProp !== 'signup' &&
             allowOauth && (
               <>
-                <Separator text="Third-party sign-in" />
+                <Separator text="OR" />
                 <OauthSignIn />
               </>
             )}

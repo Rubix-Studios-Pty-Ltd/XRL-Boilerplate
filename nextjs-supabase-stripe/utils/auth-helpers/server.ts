@@ -53,7 +53,6 @@ export async function signInWithEmail(formData: FormData) {
     shouldCreateUser: true
   };
 
-  // If allowPassword is false, do not create a new user
   const { allowPassword } = getAuthTypes();
   if (allowPassword) options.shouldCreateUser = false;
   const { data, error } = await supabase.auth.signInWithOtp({
@@ -68,7 +67,7 @@ export async function signInWithEmail(formData: FormData) {
       error.message
     );
   } else if (data) {
-    cookieStore.set('preferredSignInView', 'email_signin', { path: '/' });
+    cookieStore.set('preferredSignInView', 'email_signin', { path: '/account' });
     redirectPath = getStatusRedirect(
       '/signin/email_signin',
       'Success!',
@@ -89,7 +88,6 @@ export async function signInWithEmail(formData: FormData) {
 export async function requestPasswordUpdate(formData: FormData) {
   const callbackURL = getURL('/auth/reset_password');
 
-  // Get form data
   const email = String(formData.get('email')).trim();
   let redirectPath: string;
 
@@ -151,7 +149,7 @@ export async function signInWithPassword(formData: FormData) {
     );
   } else if (data.user) {
     cookieStore.set('preferredSignInView', 'password_signin', { path: '/' });
-    redirectPath = getStatusRedirect('/', 'Success!', 'You are now signed in.');
+    redirectPath = getStatusRedirect('/account', 'Success!', 'You are now signed in.');
   } else {
     redirectPath = getErrorRedirect(
       '/signin/password_signin',
@@ -249,7 +247,7 @@ export async function updatePassword(formData: FormData) {
     );
   } else if (data.user) {
     redirectPath = getStatusRedirect(
-      '/',
+      '/account',
       'Success!',
       'Your password has been updated.'
     );
@@ -265,10 +263,8 @@ export async function updatePassword(formData: FormData) {
 }
 
 export async function updateEmail(formData: FormData) {
-  // Get form data
   const newEmail = String(formData.get('newEmail')).trim();
 
-  // Check that the email is valid
   if (!isValidEmail(newEmail)) {
     return getErrorRedirect(
       '/account',
@@ -306,13 +302,18 @@ export async function updateEmail(formData: FormData) {
 }
 
 export async function updateName(formData: FormData) {
-  // Get form data
   const fullName = String(formData.get('fullName')).trim();
 
   const supabase = createClient();
   const { error, data } = await supabase.auth.updateUser({
     data: { full_name: fullName }
   });
+
+  const userId = data.user?.id as string;
+  const { error: dbError } = await supabase
+    .from('users')
+    .update({ full_name: fullName })
+    .eq('id', userId);
 
   if (error) {
     return getErrorRedirect(

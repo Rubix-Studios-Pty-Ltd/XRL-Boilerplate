@@ -1,11 +1,20 @@
 'use client';
 
-import Button from '@/components/ui/Button';
-import Card from '@/components/ui/Card';
-import { updateEmail } from '@/utils/auth-helpers/server';
+import { Button } from '@/components/ui/button';
+import Card from '@/components/ui/card';
 import { handleRequest } from '@/utils/auth-helpers/client';
+import { Input } from "@/components/ui/input"
+import { Loader2 } from "lucide-react"
+import { updateEmail } from '@/utils/auth-helpers/server';
+import { useForm } from "react-hook-form"
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+} from "@/components/ui/form"
 
 export default function EmailForm({
   userEmail
@@ -13,11 +22,12 @@ export default function EmailForm({
   userEmail: string | undefined;
 }) {
   const router = useRouter();
+  const form = useForm();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     setIsSubmitting(true);
-    // Check if the new email is the same as the old email
+
     if (e.currentTarget.newEmail.value === userEmail) {
       e.preventDefault();
       setIsSubmitting(false);
@@ -37,27 +47,51 @@ export default function EmailForm({
             We will email you to verify the change.
           </p>
           <Button
-            variant="slim"
             type="submit"
             form="emailForm"
-            loading={isSubmitting}
+            className="min-w-32"
+            disabled={isSubmitting}
           >
-            Update Email
+          {isSubmitting ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Please wait
+            </>
+          ) : (
+            'Update Email'
+          )}
           </Button>
         </div>
       }
     >
       <div className="mt-8 mb-4 text-xl font-semibold">
-        <form id="emailForm" onSubmit={(e) => handleSubmit(e)}>
-          <input
-            type="text"
+      <Form {...form}>
+        <form id="emailForm" onSubmit={(e) => onSubmit(e)}>
+        <FormField
             name="newEmail"
-            className="w-1/2 p-3 rounded-md bg-zinc-800"
-            defaultValue={userEmail ?? ''}
-            placeholder="Your email"
-            maxLength={64}
+            control={form.control}
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <Input 
+                    id="email"
+                    type="email"
+                    className="focus-visible:ring-0"
+                    autoCapitalize="none"
+                    autoComplete="email"
+                    autoCorrect="off"
+                    defaultValue={userEmail ?? ''}
+                    placeholder="" {...field} 
+                    onChange={(e) => {
+                      field.onChange(e.target.value.toLowerCase());
+                    }}
+                  />
+                </FormControl>
+              </FormItem>
+            )}
           />
         </form>
+        </Form>
       </div>
     </Card>
   );

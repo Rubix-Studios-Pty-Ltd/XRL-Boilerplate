@@ -1,13 +1,22 @@
 'use client';
 
-import Button from '@/components/ui/Button';
-import Link from 'next/link';
-import { signInWithEmail } from '@/utils/auth-helpers/server';
+import { Button } from '@/components/ui/button';
 import { handleRequest } from '@/utils/auth-helpers/client';
+import { Input } from "@/components/ui/input"
+import Link from 'next/link';
+import { Loader2 } from "lucide-react"
+import { signInWithEmail } from '@/utils/auth-helpers/server';
+import { useForm } from "react-hook-form"
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+} from "@/components/ui/form"
 
-// Define prop type with allowPassword boolean
 interface EmailSignInProps {
   allowPassword: boolean;
   redirectMethod: string;
@@ -15,68 +24,81 @@ interface EmailSignInProps {
 }
 
 export default function EmailSignIn({
-  allowPassword,
   redirectMethod,
   disableButton
 }: EmailSignInProps) {
   const router = useRouter();
+  const form = useForm();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    setIsSubmitting(true); // Disable the button while the request is being handled
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsSubmitting(true);
 
+    const form = e.currentTarget;
     const nextRouter = redirectMethod === 'client' ? router : null;
     await handleRequest(e, signInWithEmail, nextRouter);
 
+    form.reset();
     setIsSubmitting(false);
   };
 
   return (
-    <div className="my-8">
+    <div className="my-3">
+      <Form {...form}>
       <form
         noValidate={true}
         className="mb-4"
-        onSubmit={(e) => handleSubmit(e)}
+        onSubmit={(e) => onSubmit(e)}
       >
         <div className="grid gap-2">
-          <div className="grid gap-1">
-            <label htmlFor="email">Email</label>
-            <input
-              id="email"
-              placeholder="name@example.com"
-              type="email"
-              name="email"
-              autoCapitalize="none"
-              autoComplete="email"
-              autoCorrect="off"
-              className="w-full p-3 rounded-md bg-zinc-800"
-            />
-          </div>
+          <FormField
+            name="email"
+            control={form.control}
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Email</FormLabel>
+                <FormControl>
+                  <Input 
+                    id="email"
+                    type="email"
+                    className="focus-visible:ring-0"
+                    autoCapitalize="none"
+                    autoComplete="email"
+                    autoCorrect="off"
+                    placeholder="" {...field} 
+                    onChange={(e) => {
+                      field.onChange(e.target.value.toLowerCase());
+                    }}
+                  />
+                </FormControl>
+              </FormItem>
+            )}
+          />
           <Button
-            variant="slim"
             type="submit"
             className="mt-1"
-            loading={isSubmitting}
-            disabled={disableButton}
+            disabled={isSubmitting || disableButton}
           >
-            Sign in
+          {isSubmitting ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              Please wait
+            </>
+          ) : (
+            'Send email'
+          )}
           </Button>
         </div>
       </form>
-      {allowPassword && (
-        <>
-          <p>
-            <Link href="/signin/password_signin" className="font-light text-sm">
-              Sign in with email and password
-            </Link>
-          </p>
-          <p>
-            <Link href="/signin/signup" className="font-light text-sm">
-              Don't have an account? Sign up
-            </Link>
-          </p>
-        </>
-      )}
+      </Form>
+      <div>
+        <div className="my-1">
+          <Link href="/signin/password_signin" className="text-xs font-bold">
+            Sign in with email and password
+          </Link>
+        </div>
+      </div>
     </div>
   );
 }

@@ -1,12 +1,21 @@
 'use client';
 
-import Button from '@/components/ui/Button';
-import React from 'react';
-import Link from 'next/link';
-import { signUp } from '@/utils/auth-helpers/server';
+import { Button } from '@/components/ui/button';
 import { handleRequest } from '@/utils/auth-helpers/client';
+import { Input } from "@/components/ui/input"
+import Link from 'next/link';
+import { Loader2 } from "lucide-react"
+import { signUp } from '@/utils/auth-helpers/server';
+import { useForm } from "react-hook-form"
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+} from "@/components/ui/form"
 
 // Define prop type with allowEmail boolean
 interface SignUpProps {
@@ -15,71 +24,102 @@ interface SignUpProps {
 }
 
 export default function SignUp({ allowEmail, redirectMethod }: SignUpProps) {
-  const router = useRouter(); // Always call the hook
+  const router = useRouter();
+  const form = useForm();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    setIsSubmitting(true); // Disable the button while the request is being handled
+  const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsSubmitting(true);
 
-    // Conditionally use the router based on redirectMethod
+    const form = e.currentTarget;
     const nextRouter = redirectMethod === 'client' ? router : null;
     await handleRequest(e, signUp, nextRouter);
 
+    form.reset();
     setIsSubmitting(false);
   };
 
   return (
-    <div className="my-8">
-      <form
-        noValidate={true}
-        className="mb-4"
-        onSubmit={(e) => handleSubmit(e)}
-      >
-        <div className="grid gap-2">
-          <div className="grid gap-1">
-            <label htmlFor="email">Email</label>
-            <input
-              id="email"
-              placeholder="name@example.com"
-              type="email"
-              name="email"
-              autoCapitalize="none"
-              autoComplete="email"
-              autoCorrect="off"
-              className="w-full p-3 rounded-md bg-zinc-800"
-            />
-            <label htmlFor="password">Password</label>
-            <input
-              id="password"
-              placeholder="Password"
-              type="password"
-              name="password"
-              autoComplete="current-password"
-              className="w-full p-3 rounded-md bg-zinc-800"
-            />
-          </div>
-          <Button
-            variant="slim"
-            type="submit"
-            className="mt-1"
-            loading={isSubmitting}
-          >
-            Sign up
-          </Button>
-        </div>
-      </form>
-      <p>Already have an account?</p>
-      <p>
-        <Link href="/signin/password_signin" className="font-light text-sm">
-          Sign in with email and password
+    <div className="my-3">
+      <div className="text-xs mb-3">
+        <Link href="/signin/password_signin">
+          <strong>Have an account?</strong> Sign in
         </Link>
-      </p>
+      </div>
+      <Form {...form}>
+        <form
+          noValidate={true}
+          className="mb-4"
+          onSubmit={(e) => onSubmit(e)}
+        >
+          <div className="grid gap-2">
+            <FormField
+              name="email"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input 
+                      id="email"
+                      type="email"
+                      className="focus-visible:ring-0"
+                      autoCapitalize="none"
+                      autoComplete="email"
+                      autoCorrect="off"
+                      placeholder="" {...field} 
+                      onChange={(e) => {
+                        field.onChange(e.target.value.toLowerCase());
+                      }}
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <FormField
+              name="password"
+              control={form.control}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Password</FormLabel>
+                  <FormControl>
+                    <Input 
+                      id="password"
+                      type="password"
+                      className="focus-visible:ring-0"
+                      autoComplete="password"
+                      placeholder="" {...field} 
+                    />
+                  </FormControl>
+                </FormItem>
+              )}
+            />
+            <Button
+              type="submit"
+              className="mt-2"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Please wait
+                </>
+              ) : (
+                'Sign in'
+              )}
+            </Button>
+          </div>
+        </form>
+      </Form>
       {allowEmail && (
-        <p>
-          <Link href="/signin/email_signin" className="font-light text-sm">
-            Sign in via magic link
-          </Link>
-        </p>
+        <div>
+          <div className="my-1">
+            <Link href="/signin/email_signin" className="font-bold text-xs">
+              Sign in via magic link
+            </Link>
+          </div>
+        </div>
       )}
     </div>
   );
